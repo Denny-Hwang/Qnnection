@@ -170,6 +170,12 @@ with st.sidebar:
         timer_preset = st.radio(
             t("timer_preset", L), [30, 60, 90], index=1, horizontal=True, key="_timer_preset",
         )
+        # 프리셋 변경 시 number_input 값도 동기화
+        if "_prev_timer_preset" not in st.session_state:
+            st.session_state._prev_timer_preset = timer_preset
+        if timer_preset != st.session_state._prev_timer_preset:
+            st.session_state.sp_timer_seconds = timer_preset
+            st.session_state._prev_timer_preset = timer_preset
         st.number_input(
             t("timer_custom", L), min_value=10, max_value=300,
             value=timer_preset, step=5, key="sp_timer_seconds",
