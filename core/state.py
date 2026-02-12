@@ -37,24 +37,29 @@ _SPEED_DEFAULTS = {
 }
 
 
+def _copy_val(v):
+    """Mutable 기본값(list 등)은 복사해서 반환, 그 외는 그대로."""
+    return v.copy() if isinstance(v, list) else v
+
+
 def init_state():
     """앱 시작 시 세션 state 초기화 (이미 있는 키는 건너뜀)."""
     for defaults in (_COMMON_DEFAULTS, _ICEBREAKER_DEFAULTS, _SPEED_DEFAULTS):
         for k, v in defaults.items():
             if k not in st.session_state:
-                st.session_state[k] = v
+                st.session_state[k] = _copy_val(v)
 
 
 def reset_icebreaker():
     """아이스브레이킹 관련 상태 초기화."""
     for k, v in _ICEBREAKER_DEFAULTS.items():
-        st.session_state[k] = v
+        st.session_state[k] = _copy_val(v)
 
 
 def reset_speed():
     """스피드게임 관련 상태 초기화."""
     for k, v in _SPEED_DEFAULTS.items():
-        st.session_state[k] = v
+        st.session_state[k] = _copy_val(v)
 
 
 def reset_all():
@@ -62,4 +67,4 @@ def reset_all():
     reset_icebreaker()
     reset_speed()
     for k, v in _COMMON_DEFAULTS.items():
-        st.session_state[k] = v
+        st.session_state[k] = _copy_val(v)
