@@ -1,7 +1,7 @@
 # Qnnection 💬
 
-> **Question + Connection** – 교회 모임 아이스브레이킹 & 스피드게임 TV 앱
-> **Question + Connection** – Icebreaker & Speed Game TV App for Church Gatherings
+> **Question + Connection** – 교회 아이스브레이킹 & 스피드게임 TV 앱
+> **Question + Connection** – Icebreaker & Speed Game TV App for Gatherings
 
 프로젝터/TV에 질문을 크게 띄워 모임을 이끌어가는 Streamlit 웹앱입니다.
 운영자는 **CSV 질문 파일만 추가/수정**하면 되고, 앱 코드는 그대로 재사용할 수 있습니다.
