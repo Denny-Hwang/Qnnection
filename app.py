@@ -33,6 +33,19 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# ── PWA 메타태그 (홈화면 바로가기 이름·아이콘) ────────────
+st.markdown(
+    """
+    <link rel="manifest" href="app/static/manifest.json">
+    <link rel="apple-touch-icon" href="app/static/icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Qnnection">
+    <meta name="theme-color" content="#FF6B6B">
+    """,
+    unsafe_allow_html=True,
+)
+
 st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
 init_state()
 

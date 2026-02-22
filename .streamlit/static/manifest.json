@@ -1,0 +1,17 @@
+{
+  "name": "Qnnection",
+  "short_name": "Qnnection",
+  "description": "교회 모임 아이스브레이킹 & 스피드게임",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0E1117",
+  "theme_color": "#FF6B6B",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
