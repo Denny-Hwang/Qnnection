@@ -1,6 +1,7 @@
 """core/state.py – st.session_state 초기화 · 모드 전환 리셋."""
 
 from __future__ import annotations
+
 import streamlit as st
 
 # ── 기본값 정의 ─────────────────────────────────────────
@@ -8,6 +9,9 @@ import streamlit as st
 # 위젯이 직접 관리하므로 여기서 제외한다.
 _COMMON_DEFAULTS = {
     "pool_df": None,
+    "sound_on": True,
+    "_pending_mode": None,  # 모드 전환 확인 대기 상태
+    "_last_flash": "",  # 직전 카드 플래시 (correct/pass)
 }
 
 _ICEBREAKER_DEFAULTS = {
@@ -15,7 +19,6 @@ _ICEBREAKER_DEFAULTS = {
     "ib_history": [],
     "ib_cursor": -1,
     "ib_current": None,
-    "ib_show_overlay": False,
     "ib_deck_built": False,
 }
 
@@ -24,7 +27,8 @@ _SPEED_DEFAULTS = {
     "sp_timer_seconds": 60,
     "sp_running": False,
     "sp_paused": False,
-    "sp_start_ts": None,
+    "sp_start_mono": None,  # monotonic 기준 (안전한 단조 시계)
+    "sp_start_wall": None,  # 클라이언트 JS 동기화용 wall clock 기준
     "sp_pause_elapsed": 0.0,
     "sp_score": 0,
     "sp_correct": 0,
@@ -34,6 +38,7 @@ _SPEED_DEFAULTS = {
     "sp_finished": False,
     "sp_deck_built": False,
     "sp_round_history": [],
+    "sp_last_action": "",  # 직전 액션 ('correct'/'pass') – 사운드/플래시 트리거용
 }
 
 
@@ -68,3 +73,22 @@ def reset_all():
     reset_speed()
     for k, v in _COMMON_DEFAULTS.items():
         st.session_state[k] = _copy_val(v)
+
+
+def has_icebreaker_progress() -> bool:
+    """진행 중인 아이스브레이킹 세션이 있는지(히스토리/현재 카드)."""
+    return bool(
+        st.session_state.get("ib_history")
+        or st.session_state.get("ib_current")
+    )
+
+
+def has_speed_progress() -> bool:
+    """진행 중인 스피드게임 라운드/점수가 있는지."""
+    return bool(
+        st.session_state.get("sp_running")
+        or st.session_state.get("sp_score")
+        or st.session_state.get("sp_correct")
+        or st.session_state.get("sp_pass")
+        or st.session_state.get("sp_round_history")
+    )

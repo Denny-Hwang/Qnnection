@@ -36,12 +36,19 @@ Qnnection/
 ├── .streamlit/
 │   └── config.toml        # 테마 / 서버 설정 | Theme & server config
 ├── core/                  # 핵심 모듈 | Core modules
-│   ├── loader.py          #   CSV 스캔·로드·검증 | CSV scan, load, validate
+│   ├── loader.py          #   CSV 스캔·로드·검증 (utf-8-sig BOM 지원) | CSV scan + load + validate (utf-8-sig BOM)
 │   ├── filtering.py       #   필터링 로직 | Filtering logic
-│   ├── deck.py            #   덱 생성·드로우·히스토리 | Deck build, draw, history
+│   ├── deck.py            #   덱 생성·드로우·히스토리·Undo | Deck build, draw, history, undo
 │   ├── state.py           #   세션 상태 관리 | Session state management
-│   ├── ui_styles.py       #   CSS·카드 HTML 생성 | CSS & card HTML generation
-│   └── i18n.py            #   한/영 번역 (200+ 키) | KO/EN translations (200+ keys)
+│   ├── ui_styles.py       #   CSS·카드 HTML 빌더 (XSS-safe) | CSS & XSS-safe card HTML builder
+│   ├── components.py      #   JS 컴포넌트: 단축키·효과음·타이머 | JS components: shortcuts, sound, timer
+│   └── i18n.py            #   한/영 번역 + 카테고리 라벨 | KO/EN translations + category labels
+├── tests/                 # 단위 테스트 (pytest) | Unit tests
+│   ├── test_deck.py
+│   ├── test_filtering.py
+│   ├── test_i18n.py
+│   ├── test_loader.py
+│   └── test_ui_styles.py
 └── decks/                 # 질문 데이터 | Question data
     ├── icebreaker/        #   아이스브레이킹 세트 | Icebreaker sets
     │   └── church_gathering_a.csv
@@ -95,12 +102,33 @@ When the round ends, a **score summary and card list** are displayed.
 | 기능 | Feature | 설명 | Description |
 |------|---------|------|-------------|
 | **표시 언어** | **Display Language** | `KO only`, `EN only`, `KO → EN`, `EN → KO` 중 선택 | Choose from 4 bilingual display modes |
-| **필터** | **Filters** | 카테고리, 깊이(1~5), 난이도(1~3), 태그 | Category, depth (1–5), difficulty (1–3), tags |
+| **필터** | **Filters** | 카테고리, 깊이(1~5), 난이도(1~3), 태그 (도움말 포함) | Category, depth (1–5), difficulty (1–3), tags (with help text) |
 | **덱 크기** | **Deck Size** | 세션에서 사용할 총 질문 수 (0 = 전체) | Total questions per session (0 = all) |
 | **셔플** | **Shuffle** | 랜덤 순서 토글 | Toggle random order on/off |
+| **효과음** | **Sound FX** | 정답/패스/시작/종료 소리 토글 (Web Audio API) | Toggle correct/pass/start/finish tones |
 | **중복 방지** | **No Repeats** | 덱 소진 전까지 같은 질문 반복 없음 | No duplicate questions until deck is exhausted |
 | **UI 언어** | **UI Language** | 한국어 / English UI 전환 | Switch between Korean and English UI |
+| **카테고리 라벨** | **Category Labels** | 슬러그 → 한/영 표시명 자동 변환 | Auto-localized category display names |
+| **단축키** | **Shortcuts** | 진행자용 키보드 단축키 (사이드바 안내) | Keyboard shortcuts for presenters (see sidebar) |
+| **모드 전환 확인** | **Mode Switch Confirm** | 진행 중 세션이 있을 때 모드 전환 확인 | Confirmation when switching modes mid-session |
+| **결과 내보내기** | **Export Results** | 히스토리/라운드 결과 CSV 다운로드 (BOM, Excel 호환) | Download session history / round results as CSV |
+| **접근성** | **Accessibility** | aria-live, 포커스 링, 동작 줄임 모드 지원 | aria-live regions, focus rings, reduced-motion support |
+| **모바일 반응형** | **Mobile Responsive** | 작은 화면에서 폰트/버튼 자동 조정 | Adaptive sizing on small screens |
 | **오류 안내** | **Error Guidance** | CSV 누락/컬럼 오류 시 에러 메시지 표시 | Friendly error messages for CSV issues |
+
+### ⌨️ 단축키 | Keyboard Shortcuts
+
+**아이스브레이킹 | Icebreaker**
+- `Space` / `→` : 다음 질문 | Next question
+- `←` : 이전 질문 | Previous question
+- `S` : 셔플 | Shuffle remaining deck
+
+**스피드게임 | Speed Game**
+- `Space` / `Y` : 정답 | Correct
+- `N` : 패스 | Pass
+- `P` : 일시정지 / 재개 | Pause / Resume
+- `Z` : Undo
+- `S` : 새 덱 | New deck (게임 시작 전 only)
 
 ---
 
