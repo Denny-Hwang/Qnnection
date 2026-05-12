@@ -1,9 +1,10 @@
 """core/deck.py – 덱 생성 · 드로우 · 히스토리 · Undo."""
 
 from __future__ import annotations
+
 import random
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -18,10 +19,24 @@ def build_deck(
         return []
     records = pool.to_dict("records")
     if shuffle:
-        random.shuffle(records)  # 시스템 랜덤, 매번 다른 순서
+        random.shuffle(records)
     if deck_size and deck_size < len(records):
         records = records[:deck_size]
     return records
+
+
+def pop_next(deck: List[Dict], shuffle: bool = True) -> Optional[Dict]:
+    """덱에서 다음 카드 1장 pop. 비어 있으면 None.
+
+    shuffle=True 면 랜덤 위치에서, False 면 앞쪽에서 뽑는다.
+    덱을 in-place로 변경.
+    """
+    if not deck:
+        return None
+    if shuffle:
+        idx = random.randint(0, len(deck) - 1)
+        return deck.pop(idx)
+    return deck.pop(0)
 
 
 def draw_next(
@@ -30,24 +45,18 @@ def draw_next(
     cursor: int,
     shuffle: bool = True,
 ) -> tuple[Dict | None, List[Dict], int, List[Dict]]:
+    """덱에서 질문 1개를 뽑아 히스토리에 추가.
+
+    cursor가 히스토리 중간을 가리키면 단순히 다음 항목으로 이동한다.
+    히스토리 끝에 있으면 deck에서 새 카드를 pop.
     """
-    덱에서 질문 1개를 뽑아 히스토리에 추가.
-    shuffle=True: 남은 덱에서 랜덤 위치로 뽑음 (매번 다른 순서).
-    shuffle=False: 앞에서부터 순서대로 뽑음.
-    """
-    # 히스토리 앞쪽에 있으면 next로 이동만
     if cursor < len(history) - 1:
         cursor += 1
         return history[cursor], history, cursor, deck
 
-    if not deck:
+    q = pop_next(deck, shuffle=shuffle)
+    if q is None:
         return None, history, cursor, deck
-
-    if shuffle:
-        idx = random.randint(0, len(deck) - 1)
-        q = deck.pop(idx)
-    else:
-        q = deck.pop(0)
 
     history.append(q)
     cursor = len(history) - 1
